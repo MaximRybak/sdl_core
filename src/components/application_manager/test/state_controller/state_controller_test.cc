@@ -30,6 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <ostream>
 #include "gtest/gtest.h"
 #include "application_manager/hmi_state.h"
 #include "application_manager/state_controller_impl.h"
@@ -120,6 +121,8 @@ struct HmiStatesIDComparator {
 
 #define MEDIA true
 #define NOT_MEDIA false
+#define PROJECTION true
+#define NOT_PROJECTION false
 #define VC true
 #define NOT_VC false
 #define NAVI true
@@ -131,6 +134,26 @@ enum ApplicationType {
   APP_TYPE_MEDIA,
   APP_TYPE_ATTENUATED
 };
+
+std::ostream& operator<<(std::ostream& os, const ApplicationType src) {
+#define ENUM_CASE(val) \
+  case val:            \
+    os << #val;        \
+    break;
+
+  switch (src) {
+    ENUM_CASE(APP_TYPE_NON_MEDIA)
+    ENUM_CASE(APP_TYPE_NAVI)
+    ENUM_CASE(APP_TYPE_MEDIA)
+    ENUM_CASE(APP_TYPE_ATTENUATED)
+    default:
+      os << "UNRECOGNIZED(" << static_cast<int>(src) << ")";
+      break;
+  }
+#undef ENUM_CASE
+
+  return os;
+}
 
 class StateControllerImplTest : public ::testing::Test {
  public:
@@ -171,6 +194,10 @@ class StateControllerImplTest : public ::testing::Test {
   NiceMock<application_manager_test::MockApplication>* navi_app_ptr_;
   uint32_t navi_app_id_ = 1762;
 
+  am::ApplicationSharedPtr projection_app_;
+  NiceMock<application_manager_test::MockApplication>* projection_app_ptr_;
+  uint32_t projection_app_id_ = 1763;
+
   am::ApplicationSharedPtr media_app_;
   NiceMock<application_manager_test::MockApplication>* media_app_ptr_;
   uint32_t media_app_id_ = 1801;
@@ -182,6 +209,10 @@ class StateControllerImplTest : public ::testing::Test {
   am::ApplicationSharedPtr media_navi_app_;
   NiceMock<application_manager_test::MockApplication>* media_navi_app_ptr_;
   uint32_t media_navi_app_id_ = 1855;
+
+  am::ApplicationSharedPtr media_projection_app_;
+  NiceMock<application_manager_test::MockApplication>* media_projection_app_ptr_;
+  uint32_t media_projection_app_id_ = 1856;
 
   am::ApplicationSharedPtr media_vc_app_;
   NiceMock<application_manager_test::MockApplication>* media_vc_app_ptr_;
@@ -455,10 +486,10 @@ class StateControllerImplTest : public ::testing::Test {
 
   /**
    * @brief Prepare list of resultant HMI states for testing HMIState, for
-   * case if navi streaming mode is active
+   * case if video streaming mode is active
    * @param result_hmi state will contain resultant HMI states.
    */
-  void PrepareNaviStreamingHMIStateResults(
+  void PrepareVideoStreamingHmiStateResults(
       std::vector<am::HmiStatePtr>& result_hmi_state, ApplicationType app_t) {
     namespace HMILevel = mobile_apis::HMILevel;
     namespace AudioStreamingState = mobile_apis::AudioStreamingState;
@@ -474,7 +505,7 @@ class StateControllerImplTest : public ::testing::Test {
                            SystemContext::SYSCTXT_MAIN));
         break;
       }
-      case APP_TYPE_NAVI:
+//      case APP_TYPE_NAVI:
       case APP_TYPE_MEDIA: {
         PrepareCommonStateResults(result_hmi_state);
         result_hmi_state.push_back(
@@ -499,6 +530,59 @@ class StateControllerImplTest : public ::testing::Test {
                            SystemContext::SYSCTXT_MAIN));
         break;
       }
+       case APP_TYPE_NAVI: {
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_NONE,
+                            AudioStreamingState::NOT_AUDIBLE,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_MAIN));
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_NONE,
+                            AudioStreamingState::NOT_AUDIBLE,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_VRSESSION));
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_NONE,
+                            AudioStreamingState::NOT_AUDIBLE,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_MENU));
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_NONE,
+                            AudioStreamingState::NOT_AUDIBLE,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_HMI_OBSCURED));
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_NONE,
+                            AudioStreamingState::NOT_AUDIBLE,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_ALERT));
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_BACKGROUND,
+                            AudioStreamingState::NOT_AUDIBLE,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_MAIN));
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_LIMITED,
+                            AudioStreamingState::AUDIBLE,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_MAIN));
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_LIMITED,
+                            AudioStreamingState::ATTENUATED,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_MAIN));
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_FULL,
+                            AudioStreamingState::NOT_AUDIBLE,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_MAIN));
+         result_hmi_state.push_back(
+             createHmiState(HMILevel::HMI_FULL,
+                            AudioStreamingState::AUDIBLE,
+                            VideoStreamingState::NOT_STREAMABLE,
+                            SystemContext::SYSCTXT_MAIN));
+         break;
+       }
       default: { break; }
     }
   }
@@ -570,22 +654,21 @@ class StateControllerImplTest : public ::testing::Test {
     if (APP_TYPE_NON_MEDIA == app_t) {
       it_begin = valid_states_for_not_audio_app_.begin();
       it_end = valid_states_for_not_audio_app_.end();
-      ASSERT_TRUE(result_hmi_state.size() ==
-                  valid_states_for_not_audio_app_.size());
+      ASSERT_EQ(valid_states_for_not_audio_app_.size(),
+                result_hmi_state.size());
     } else {
       it_begin = valid_states_for_audio_app_.begin();
       it_end = valid_states_for_audio_app_.end();
-      ASSERT_TRUE(result_hmi_state.size() ==
-                  valid_states_for_audio_app_.size());
+      ASSERT_EQ(valid_states_for_audio_app_.size(), result_hmi_state.size());
     }
     std::vector<am::HmiStatePtr>::iterator it_result_begin =
         result_hmi_state.begin();
     for (; it_begin != it_end; ++it_begin, ++it_result_begin) {
       hmi_state->set_parent(*it_begin);
       HmiStatesComparator st_comp(hmi_state);
-      static size_t counter = 0;
-      std::cout << counter++ << std::endl;
-      ASSERT_TRUE(st_comp(*it_result_begin));
+      EXPECT_TRUE(st_comp(*it_result_begin))
+          << "Wrong state for app type '" << app_t << "': Actual " << *hmi_state
+          << ", expected " << **it_result_begin;
     }
   }
 
@@ -659,19 +742,23 @@ class StateControllerImplTest : public ::testing::Test {
       uint32_t app_id,
       bool media,
       bool navi,
+      bool projection,
       bool vc) {
     *app_mock = new NiceMock<application_manager_test::MockApplication>;
 
-    Mock::AllowLeak(*app_mock);  // WorkAround for gogletest bug
+    Mock::AllowLeak(*app_mock);  // WorkAround for googletest bug
     am::ApplicationSharedPtr app(*app_mock);
 
     ON_CALL(**app_mock, app_id()).WillByDefault(Return(app_id));
     ON_CALL(**app_mock, is_media_application()).WillByDefault(Return(media));
     ON_CALL(**app_mock, is_navi()).WillByDefault(Return(navi));
+    ON_CALL(**app_mock, mobile_projection_enabled()).WillByDefault(Return(projection));
     ON_CALL(**app_mock, is_voice_communication_supported())
         .WillByDefault(Return(vc));
     ON_CALL(**app_mock, IsAudioApplication())
         .WillByDefault(Return(media || navi || vc));
+    ON_CALL(**app_mock, IsVideoApplication())
+        .WillByDefault(Return(navi || projection));
 
     EXPECT_CALL(**app_mock, usage_report())
         .WillRepeatedly(ReturnRef(usage_stat));
@@ -868,25 +955,31 @@ class StateControllerImplTest : public ::testing::Test {
 
   void ConfigureApps() {
     simple_app_ = ConfigureApp(
-        &simple_app_ptr_, simple_app_id_, NOT_MEDIA, NOT_NAVI, NOT_VC);
+        &simple_app_ptr_, simple_app_id_, NOT_MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
     media_app_ =
-        ConfigureApp(&media_app_ptr_, media_app_id_, MEDIA, NOT_NAVI, NOT_VC);
+        ConfigureApp(&media_app_ptr_, media_app_id_, MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
     navi_app_ =
-        ConfigureApp(&navi_app_ptr_, navi_app_id_, NOT_MEDIA, NAVI, NOT_VC);
-    vc_app_ = ConfigureApp(&vc_app_ptr_, vc_app_id_, NOT_MEDIA, NOT_NAVI, VC);
+        ConfigureApp(&navi_app_ptr_, navi_app_id_, NOT_MEDIA, NAVI, NOT_PROJECTION, NOT_VC);
+    projection_app_ =
+        ConfigureApp(&projection_app_ptr_, projection_app_id_, NOT_MEDIA, NOT_NAVI, PROJECTION, NOT_VC);
+    vc_app_ = ConfigureApp(&vc_app_ptr_, vc_app_id_, NOT_MEDIA, NOT_NAVI, NOT_PROJECTION, VC);
     media_navi_app_ = ConfigureApp(
-        &media_navi_app_ptr_, media_navi_app_id_, MEDIA, NAVI, NOT_VC);
+        &media_navi_app_ptr_, media_navi_app_id_, MEDIA, NAVI, NOT_PROJECTION, NOT_VC);
+    media_projection_app_ = ConfigureApp(
+        &media_projection_app_ptr_, media_projection_app_id_, MEDIA, NOT_NAVI, PROJECTION, NOT_VC);
     media_vc_app_ =
-        ConfigureApp(&media_vc_app_ptr_, media_vc_app_id_, MEDIA, NOT_NAVI, VC);
+        ConfigureApp(&media_vc_app_ptr_, media_vc_app_id_, MEDIA, NOT_NAVI, NOT_PROJECTION, VC);
     navi_vc_app_ =
-        ConfigureApp(&navi_vc_app_ptr_, navi_vc_app_id_, NOT_MEDIA, NAVI, VC);
+        ConfigureApp(&navi_vc_app_ptr_, navi_vc_app_id_, NOT_MEDIA, NAVI, NOT_PROJECTION, VC);
     media_navi_vc_app_ = ConfigureApp(
-        &media_navi_vc_app_ptr_, media_navi_vc_app_id_, MEDIA, NAVI, VC);
+        &media_navi_vc_app_ptr_, media_navi_vc_app_id_, MEDIA, NAVI, NOT_PROJECTION, VC);
     applications_list_.push_back(simple_app_);
     applications_list_.push_back(media_app_);
     applications_list_.push_back(navi_app_);
+    applications_list_.push_back(projection_app_);
     applications_list_.push_back(vc_app_);
     applications_list_.push_back(media_navi_app_);
+    applications_list_.push_back(media_projection_app_);
     applications_list_.push_back(media_vc_app_);
     applications_list_.push_back(navi_vc_app_);
     applications_list_.push_back(media_navi_vc_app_);
@@ -895,8 +988,10 @@ class StateControllerImplTest : public ::testing::Test {
     ASSERT_EQ(simple_app_.get(), simple_app_ptr_);
     ASSERT_EQ(media_app_.get(), media_app_ptr_);
     ASSERT_EQ(navi_app_.get(), navi_app_ptr_);
+    ASSERT_EQ(projection_app_.get(), projection_app_ptr_);
     ASSERT_EQ(vc_app_.get(), vc_app_ptr_);
     ASSERT_EQ(media_navi_app_.get(), media_navi_app_ptr_);
+    ASSERT_EQ(media_projection_app_.get(), media_projection_app_ptr_);
     ASSERT_EQ(media_vc_app_.get(), media_vc_app_ptr_);
     ASSERT_EQ(navi_vc_app_.get(), navi_vc_app_ptr_);
     ASSERT_EQ(media_navi_vc_app_.get(), media_navi_vc_app_ptr_);
@@ -904,8 +999,10 @@ class StateControllerImplTest : public ::testing::Test {
     ASSERT_EQ(simple_app_->app_id(), simple_app_id_);
     ASSERT_EQ(media_app_->app_id(), media_app_id_);
     ASSERT_EQ(navi_app_->app_id(), navi_app_id_);
+    ASSERT_EQ(projection_app_->app_id(), projection_app_id_);
     ASSERT_EQ(vc_app_->app_id(), vc_app_id_);
     ASSERT_EQ(media_navi_app_->app_id(), media_navi_app_id_);
+    ASSERT_EQ(media_projection_app_->app_id(), media_projection_app_id_);
     ASSERT_EQ(media_vc_app_->app_id(), media_vc_app_id_);
     ASSERT_EQ(navi_vc_app_->app_id(), navi_vc_app_id_);
     ASSERT_EQ(media_navi_vc_app_->app_id(), media_navi_vc_app_id_);
@@ -913,35 +1010,54 @@ class StateControllerImplTest : public ::testing::Test {
     ASSERT_FALSE(simple_app_->IsAudioApplication());
     ASSERT_TRUE(media_app_->IsAudioApplication());
     ASSERT_TRUE(navi_app_->IsAudioApplication());
+    ASSERT_FALSE(projection_app_->IsAudioApplication());
     ASSERT_TRUE(vc_app_->IsAudioApplication());
     ASSERT_TRUE(media_navi_app_->IsAudioApplication());
+    ASSERT_TRUE(media_projection_app_->IsAudioApplication());
     ASSERT_TRUE(media_vc_app_->IsAudioApplication());
     ASSERT_TRUE(navi_vc_app_->IsAudioApplication());
     ASSERT_TRUE(media_navi_vc_app_->IsAudioApplication());
 
+    ASSERT_FALSE(simple_app_->IsVideoApplication());
+    ASSERT_FALSE(media_app_->IsVideoApplication());
+    ASSERT_TRUE(navi_app_->IsVideoApplication());
+    ASSERT_TRUE(projection_app_->IsVideoApplication());
+    ASSERT_FALSE(vc_app_->IsVideoApplication());
+    ASSERT_TRUE(media_navi_app_->IsVideoApplication());
+    ASSERT_TRUE(media_projection_app_->IsVideoApplication());
+    ASSERT_FALSE(media_vc_app_->IsVideoApplication());
+    ASSERT_TRUE(navi_vc_app_->IsVideoApplication());
+    ASSERT_TRUE(media_navi_vc_app_->IsVideoApplication());
+
     ASSERT_FALSE(simple_app_->is_media_application());
     ASSERT_TRUE(media_app_->is_media_application());
     ASSERT_FALSE(navi_app_->is_media_application());
+    ASSERT_FALSE(projection_app_->is_media_application());
     ASSERT_FALSE(vc_app_->is_media_application());
     ASSERT_TRUE(media_navi_app_->is_media_application());
+    ASSERT_TRUE(media_projection_app_->is_media_application());
     ASSERT_TRUE(media_vc_app_->is_media_application());
     ASSERT_FALSE(navi_vc_app_->is_media_application());
     ASSERT_TRUE(media_navi_vc_app_->is_media_application());
 
     ASSERT_FALSE(simple_app_->is_navi());
-    ASSERT_TRUE(navi_app_->is_navi());
     ASSERT_FALSE(media_app_->is_navi());
+    ASSERT_TRUE(navi_app_->is_navi());
+    ASSERT_FALSE(projection_app_->is_navi());
     ASSERT_FALSE(vc_app_->is_navi());
     ASSERT_TRUE(media_navi_app_->is_navi());
+    ASSERT_FALSE(media_projection_app_->is_navi());
     ASSERT_FALSE(media_vc_app_->is_navi());
     ASSERT_TRUE(navi_vc_app_->is_navi());
     ASSERT_TRUE(media_navi_vc_app_->is_navi());
 
     ASSERT_FALSE(simple_app_->is_voice_communication_supported());
-    ASSERT_FALSE(navi_app_->is_voice_communication_supported());
     ASSERT_FALSE(media_app_->is_voice_communication_supported());
+    ASSERT_FALSE(navi_app_->is_voice_communication_supported());
+    ASSERT_FALSE(projection_app_->is_voice_communication_supported());
     ASSERT_TRUE(vc_app_->is_voice_communication_supported());
     ASSERT_FALSE(media_navi_app_->is_voice_communication_supported());
+    ASSERT_FALSE(media_projection_app_->is_voice_communication_supported());
     ASSERT_TRUE(media_vc_app_->is_voice_communication_supported());
     ASSERT_TRUE(navi_vc_app_->is_voice_communication_supported());
     ASSERT_TRUE(media_navi_vc_app_->is_voice_communication_supported());
@@ -1468,9 +1584,9 @@ TEST_F(StateControllerImplTest,
   NiceMock<application_manager_test::MockApplication>* app_moved_to_full_mock;
 
   app_in_full =
-      ConfigureApp(&app_in_full_mock, 1761, NOT_MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&app_in_full_mock, 1761, NOT_MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
   app_moved_to_full =
-      ConfigureApp(&app_moved_to_full_mock, 1796, NOT_MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&app_moved_to_full_mock, 1796, NOT_MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   InsertApplication(app_in_full);
   InsertApplication(app_moved_to_full);
@@ -1486,7 +1602,7 @@ TEST_F(StateControllerImplTest,
   state_ctrl_->SetRegularState(app_moved_to_full, FullNotAudibleState(), false);
 }
 
-TEST_F(StateControllerImplTest, SetFullToSimpleAppWhileAudioAppAppIsInFull) {
+TEST_F(StateControllerImplTest, SetFullToSimpleAppWhileAudioAppIsInFull) {
   namespace HMILevel = mobile_apis::HMILevel;
   namespace SystemContext = mobile_apis::SystemContext;
   am::ApplicationSharedPtr app_in_full = media_navi_vc_app_;
@@ -1542,11 +1658,11 @@ TEST_F(StateControllerImplTest,
   namespace SystemContext = mobile_apis::SystemContext;
   NiceMock<application_manager_test::MockApplication>* app_in_full_mock;
   am::ApplicationSharedPtr app_in_full =
-      ConfigureApp(&app_in_full_mock, 1761, MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&app_in_full_mock, 1761, MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   NiceMock<application_manager_test::MockApplication>* app_moved_to_full_mock;
   am::ApplicationSharedPtr app_moved_to_full =
-      ConfigureApp(&app_moved_to_full_mock, 1796, MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&app_moved_to_full_mock, 1796, MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   InsertApplication(app_in_full);
   InsertApplication(app_moved_to_full);
@@ -1568,11 +1684,11 @@ TEST_F(StateControllerImplTest,
 
   NiceMock<application_manager_test::MockApplication>* app_in_limited_mock;
   am::ApplicationSharedPtr app_in_limited =
-      ConfigureApp(&app_in_limited_mock, 1761, NOT_MEDIA, NAVI, NOT_VC);
+      ConfigureApp(&app_in_limited_mock, 1761, NOT_MEDIA, NAVI, NOT_PROJECTION, NOT_VC);
 
   NiceMock<application_manager_test::MockApplication>* app_moved_to_full_mock;
   am::ApplicationSharedPtr app_moved_to_full =
-      ConfigureApp(&app_moved_to_full_mock, 1796, NOT_MEDIA, NAVI, VC);
+      ConfigureApp(&app_moved_to_full_mock, 1796, NOT_MEDIA, NAVI, NOT_PROJECTION, VC);
 
   InsertApplication(app_in_limited);
   InsertApplication(app_moved_to_full);
@@ -1593,12 +1709,12 @@ TEST_F(StateControllerImplTest,
   namespace SystemContext = mobile_apis::SystemContext;
   NiceMock<application_manager_test::MockApplication>* app_in_limited_mock;
   am::ApplicationSharedPtr app_in_limited =
-      ConfigureApp(&app_in_limited_mock, 1761, NOT_MEDIA, NOT_NAVI, VC);
+      ConfigureApp(&app_in_limited_mock, 1761, NOT_MEDIA, NOT_NAVI, NOT_PROJECTION, VC);
 
   NiceMock<application_manager_test::MockApplication>*
       app_moved_to_limited_mock;
   am::ApplicationSharedPtr app_moved_to_limited =
-      ConfigureApp(&app_moved_to_limited_mock, 1796, NOT_MEDIA, NOT_NAVI, VC);
+      ConfigureApp(&app_moved_to_limited_mock, 1796, NOT_MEDIA, NOT_NAVI, NOT_PROJECTION, VC);
 
   InsertApplication(app_in_limited);
   InsertApplication(app_moved_to_limited);
@@ -1747,7 +1863,7 @@ TEST_F(StateControllerImplTest,
 
   NiceMock<application_manager_test::MockApplication>* app_moved_to_full_mock;
   am::ApplicationSharedPtr app_moved_to_full =
-      ConfigureApp(&app_moved_to_full_mock, 1761, NOT_MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&app_moved_to_full_mock, 1761, NOT_MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   am::ApplicationSharedPtr limited_app = media_app_;
   NiceMock<application_manager_test::MockApplication>* limited_app_mock =
@@ -1755,7 +1871,7 @@ TEST_F(StateControllerImplTest,
 
   NiceMock<application_manager_test::MockApplication>* full_app_mock;
   am::ApplicationSharedPtr full_app =
-      ConfigureApp(&full_app_mock, 1796, NOT_MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&full_app_mock, 1796, NOT_MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   InsertApplication(app_moved_to_full);
   InsertApplication(limited_app);
@@ -1784,15 +1900,15 @@ TEST_F(
 
   NiceMock<application_manager_test::MockApplication>* app_moved_to_full_mock;
   am::ApplicationSharedPtr app_moved_to_full =
-      ConfigureApp(&app_moved_to_full_mock, 1761, MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&app_moved_to_full_mock, 1761, MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   NiceMock<application_manager_test::MockApplication>* limited_app_mock;
   am::ApplicationSharedPtr limited_app =
-      ConfigureApp(&limited_app_mock, 1762, MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&limited_app_mock, 1762, MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   NiceMock<application_manager_test::MockApplication>* full_app_mock;
   am::ApplicationSharedPtr full_app =
-      ConfigureApp(&full_app_mock, 1796, NOT_MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&full_app_mock, 1796, NOT_MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   InsertApplication(app_moved_to_full);
   InsertApplication(limited_app);
@@ -1821,15 +1937,15 @@ TEST_F(
 
   NiceMock<application_manager_test::MockApplication>* app_moved_to_full_mock;
   am::ApplicationSharedPtr app_moved_to_full =
-      ConfigureApp(&app_moved_to_full_mock, 1761, MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&app_moved_to_full_mock, 1761, MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   NiceMock<application_manager_test::MockApplication>* limited_app_mock;
   am::ApplicationSharedPtr limited_app =
-      ConfigureApp(&limited_app_mock, 1762, MEDIA, NOT_NAVI, NOT_VC);
+      ConfigureApp(&limited_app_mock, 1762, MEDIA, NOT_NAVI, NOT_PROJECTION, NOT_VC);
 
   NiceMock<application_manager_test::MockApplication>* full_app_mock;
   am::ApplicationSharedPtr full_app =
-      ConfigureApp(&full_app_mock, 1796, NOT_MEDIA, NAVI, NOT_VC);
+      ConfigureApp(&full_app_mock, 1796, NOT_MEDIA, NAVI, NOT_PROJECTION, NOT_VC);
 
   InsertApplication(app_moved_to_full);
   InsertApplication(limited_app);
@@ -2212,31 +2328,31 @@ TEST_F(StateControllerImplTest,
 TEST_F(StateControllerImplTest, SetNaviStreamingStateForNonMediaApplication) {
   am::HmiStatePtr state_navi_streming =
       utils::MakeShared<am::VideoStreamingHmiState>(simple_app_,
-                                                    app_manager_mock_);
+                                                   app_manager_mock_);
   TestSetState(simple_app_,
                state_navi_streming,
                APP_TYPE_NON_MEDIA,
-               &StateControllerImplTest::PrepareNaviStreamingHMIStateResults);
+               &StateControllerImplTest::PrepareVideoStreamingHmiStateResults);
 }
 //------------------------------------------------------------------------------
 TEST_F(StateControllerImplTest,
        SetNaviStreamingStateMediaApplicationAttenuatedNotSupported) {
   am::HmiStatePtr state_navi_streming =
       utils::MakeShared<am::VideoStreamingHmiState>(media_app_,
-                                                    app_manager_mock_);
+                                                   app_manager_mock_);
   EXPECT_CALL(app_manager_mock_, is_attenuated_supported())
       .WillRepeatedly(Return(false));
   TestSetState(media_app_,
                state_navi_streming,
                APP_TYPE_MEDIA,
-               &StateControllerImplTest::PrepareNaviStreamingHMIStateResults);
+               &StateControllerImplTest::PrepareVideoStreamingHmiStateResults);
 }
 //------------------------------------------------------------------------------
 TEST_F(StateControllerImplTest,
        SetNaviStreamingStateMediaApplicationAttenuatedSupported) {
   am::HmiStatePtr state_navi_streming =
       utils::MakeShared<am::VideoStreamingHmiState>(media_app_,
-                                                    app_manager_mock_);
+                                                   app_manager_mock_);
   EXPECT_CALL(app_manager_mock_, is_attenuated_supported())
       .WillRepeatedly(Return(true));
   TestSetState(media_app_,
@@ -2254,7 +2370,7 @@ TEST_F(StateControllerImplTest,
   TestSetState(vc_app_,
                state_navi_streming,
                APP_TYPE_MEDIA,
-               &StateControllerImplTest::PrepareNaviStreamingHMIStateResults);
+               &StateControllerImplTest::PrepareVideoStreamingHmiStateResults);
 }
 
 TEST_F(StateControllerImplTest,
@@ -2272,21 +2388,21 @@ TEST_F(StateControllerImplTest,
 TEST_F(StateControllerImplTest, SetNaviStreamingStateNaviApplication) {
   am::HmiStatePtr state_navi_streming =
       utils::MakeShared<am::VideoStreamingHmiState>(navi_app_,
-                                                    app_manager_mock_);
+                                                   app_manager_mock_);
   TestSetState(navi_app_,
                state_navi_streming,
                APP_TYPE_NAVI,
-               &StateControllerImplTest::PrepareNaviStreamingHMIStateResults);
+               &StateControllerImplTest::PrepareVideoStreamingHmiStateResults);
 }
 
 TEST_F(StateControllerImplTest, SetNaviStreamingStateMediaNaviApplication) {
   am::HmiStatePtr state_navi_streming =
       utils::MakeShared<am::VideoStreamingHmiState>(media_navi_app_,
-                                                    app_manager_mock_);
+                                                   app_manager_mock_);
   TestSetState(media_navi_app_,
                state_navi_streming,
                APP_TYPE_NAVI,
-               &StateControllerImplTest::PrepareNaviStreamingHMIStateResults);
+               &StateControllerImplTest::PrepareVideoStreamingHmiStateResults);
 }
 
 TEST_F(StateControllerImplTest, SetSafetyModeStateForNonMediaApplication) {
