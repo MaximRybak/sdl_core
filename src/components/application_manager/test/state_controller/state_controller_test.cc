@@ -474,6 +474,7 @@ class StateControllerImplTest : public ::testing::Test {
                            SystemContext::SYSCTXT_MAIN));
         break;
       }
+      case APP_TYPE_NAVI:
       case APP_TYPE_MEDIA: {
         PrepareCommonStateResults(result_hmi_state);
         result_hmi_state.push_back(
@@ -483,11 +484,6 @@ class StateControllerImplTest : public ::testing::Test {
                            SystemContext::SYSCTXT_MAIN));
         result_hmi_state.push_back(
             createHmiState(HMILevel::HMI_LIMITED,
-                           AudioStreamingState::ATTENUATED,
-                           VideoStreamingState::NOT_STREAMABLE,
-                           SystemContext::SYSCTXT_MAIN));
-        result_hmi_state.push_back(
-            createHmiState(HMILevel::HMI_FULL,
                            AudioStreamingState::NOT_AUDIBLE,
                            VideoStreamingState::NOT_STREAMABLE,
                            SystemContext::SYSCTXT_MAIN));
@@ -496,10 +492,11 @@ class StateControllerImplTest : public ::testing::Test {
                            AudioStreamingState::NOT_AUDIBLE,
                            VideoStreamingState::NOT_STREAMABLE,
                            SystemContext::SYSCTXT_MAIN));
-        break;
-      }
-      case APP_TYPE_NAVI: {
-        result_hmi_state = valid_states_for_audio_app_;
+        result_hmi_state.push_back(
+            createHmiState(HMILevel::HMI_FULL,
+                           AudioStreamingState::NOT_AUDIBLE,
+                           VideoStreamingState::NOT_STREAMABLE,
+                           SystemContext::SYSCTXT_MAIN));
         break;
       }
       default: { break; }
@@ -586,6 +583,8 @@ class StateControllerImplTest : public ::testing::Test {
     for (; it_begin != it_end; ++it_begin, ++it_result_begin) {
       hmi_state->set_parent(*it_begin);
       HmiStatesComparator st_comp(hmi_state);
+      static size_t counter = 0;
+      std::cout << counter++ << std::endl;
       ASSERT_TRUE(st_comp(*it_result_begin));
     }
   }
@@ -1901,7 +1900,7 @@ TEST_F(StateControllerImplTest,
 }
 
 // TODO {AKozoriz} Changed logic in state_controller
-TEST_F(StateControllerImplTest, DISABLED_ActivateAppSuccessReceivedFromHMI) {
+TEST_F(StateControllerImplTest, ActivateAppSuccessReceivedFromHMI) {
   using namespace hmi_apis;
   using namespace mobile_apis;
 
@@ -2219,9 +2218,9 @@ TEST_F(StateControllerImplTest, SetNaviStreamingStateForNonMediaApplication) {
                APP_TYPE_NON_MEDIA,
                &StateControllerImplTest::PrepareNaviStreamingHMIStateResults);
 }
-
+//------------------------------------------------------------------------------
 TEST_F(StateControllerImplTest,
-       DISABLED_SetNaviStreamingStateMediaApplicationAttenuatedNotSupported) {
+       SetNaviStreamingStateMediaApplicationAttenuatedNotSupported) {
   am::HmiStatePtr state_navi_streming =
       utils::MakeShared<am::VideoStreamingHmiState>(media_app_,
                                                     app_manager_mock_);
@@ -2232,7 +2231,7 @@ TEST_F(StateControllerImplTest,
                APP_TYPE_MEDIA,
                &StateControllerImplTest::PrepareNaviStreamingHMIStateResults);
 }
-
+//------------------------------------------------------------------------------
 TEST_F(StateControllerImplTest,
        SetNaviStreamingStateMediaApplicationAttenuatedSupported) {
   am::HmiStatePtr state_navi_streming =
@@ -2247,7 +2246,7 @@ TEST_F(StateControllerImplTest,
 }
 
 TEST_F(StateControllerImplTest,
-       DISABLED_SetNaviStreamingStateVCApplicationAttenuatedNotSupported) {
+       SetNaviStreamingStateVCApplicationAttenuatedNotSupported) {
   am::HmiStatePtr state_navi_streming =
       utils::MakeShared<am::VideoStreamingHmiState>(vc_app_, app_manager_mock_);
   EXPECT_CALL(app_manager_mock_, is_attenuated_supported())
@@ -2270,7 +2269,7 @@ TEST_F(StateControllerImplTest,
                &StateControllerImplTest::PrepareVRTTSHMIStateResults);
 }
 
-TEST_F(StateControllerImplTest, DISABLED_SetNaviStreamingStateNaviApplication) {
+TEST_F(StateControllerImplTest, SetNaviStreamingStateNaviApplication) {
   am::HmiStatePtr state_navi_streming =
       utils::MakeShared<am::VideoStreamingHmiState>(navi_app_,
                                                     app_manager_mock_);
@@ -2280,8 +2279,7 @@ TEST_F(StateControllerImplTest, DISABLED_SetNaviStreamingStateNaviApplication) {
                &StateControllerImplTest::PrepareNaviStreamingHMIStateResults);
 }
 
-TEST_F(StateControllerImplTest,
-       DISABLED_SetNaviStreamingStateMediaNaviApplication) {
+TEST_F(StateControllerImplTest, SetNaviStreamingStateMediaNaviApplication) {
   am::HmiStatePtr state_navi_streming =
       utils::MakeShared<am::VideoStreamingHmiState>(media_navi_app_,
                                                     app_manager_mock_);
