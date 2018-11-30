@@ -25,29 +25,28 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-project(formatters)
+project(telemetry_monitor_test)
+create_test(${PROJECT_NAME})
 
-add_library(${PROJECT_NAME} STATIC)
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+target_include_directories(${PROJECT_NAME}
+                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_sources(${PROJECT_NAME}
                PRIVATE
-               "${CMAKE_CURRENT_LIST_DIR}/src/CFormatterJsonBase.cc"
-               "${CMAKE_CURRENT_LIST_DIR}/src/CFormatterJsonSDLRPCv1.cc"
-               "${CMAKE_CURRENT_LIST_DIR}/src/CFormatterJsonSDLRPCv2.cc"
-               "${CMAKE_CURRENT_LIST_DIR}/src/CSmartFactory.cc"
-               "${CMAKE_CURRENT_LIST_DIR}/src/formatter_json_rpc.cc"
-               "${CMAKE_CURRENT_LIST_DIR}/src/generic_json_formatter.cc"
-               "${CMAKE_CURRENT_LIST_DIR}/src/meta_formatter.cc")
+               ${CMAKE_CURRENT_LIST_DIR}/application_manager_metric_test.cc
+               ${CMAKE_CURRENT_LIST_DIR}/application_manager_observer_test.cc
+               ${CMAKE_CURRENT_LIST_DIR}/metric_wrapper_test.cc
+               ${CMAKE_CURRENT_LIST_DIR}/protocol_handler_metric_test.cc
+               ${CMAKE_CURRENT_LIST_DIR}/protocol_handler_observer_test.cc
+               ${CMAKE_CURRENT_LIST_DIR}/telemetry_monitor_test.cc
+               ${CMAKE_CURRENT_LIST_DIR}/transport_manager_metric_test.cc
+               ${CMAKE_CURRENT_LIST_DIR}/transport_manager_observer_test.cc)
 
 target_link_libraries(${PROJECT_NAME}
-                      PUBLIC smart_objects::smart_objects utils::utils
-                             jsoncpp::jsoncpp
-                      PRIVATE components::interface)
+                      PRIVATE telemetry_monitor::telemetry_monitor
+                              components::interface)
 
-target_include_directories(${PROJECT_NAME}
-                           PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
-
-if(BUILD_TESTS)
-  add_subdirectory(test)
-endif()
+file(COPY
+     ${COMPONENTS_DIR}/telemetry_monitor/test/log4cxx.properties
+     DESTINATION
+     ${CMAKE_CURRENT_BINARY_DIR})
