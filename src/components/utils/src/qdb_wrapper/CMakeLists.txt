@@ -20,13 +20,13 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set (target_name dbms)
-include (GNUInstallDirs)
+set(target_name dbms)
+include(GNUInstallDirs)
 
-add_library (${target_name} STATIC)
-add_library (${PROJECT_NAME}::${target_name} ALIAS ${target_name})
+add_library(${target_name} STATIC)
+add_library(${PROJECT_NAME}::${target_name} ALIAS ${target_name})
 
-target_sources (
+target_sources(
   ${target_name}
   PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/sql_database.cc"
@@ -34,15 +34,15 @@ target_sources (
   "${CMAKE_CURRENT_LIST_DIR}/sql_query.cc"
 )
 
-target_link_libraries (${target_name} PUBLIC qdb utils::utils PRIVATE components::interface)
+target_link_libraries(${target_name} PUBLIC qdb utils::utils PRIVATE components::interface)
 
-install (
+install(
   FILES "${CMAKE_CURRENT_LIST_DIR}/policy.ini"
   DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}/AppLink"
   COMPONENT sdl_core
 )
 
-install (
+install(
   FILES "${CMAKE_CURRENT_LIST_DIR}/qdbserver.sh"
   DESTINATION "${CMAKE_INSTALL_BINDIR}"
   COMPONENT

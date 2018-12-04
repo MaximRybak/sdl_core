@@ -20,13 +20,13 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-project (rpc_plugins)
+project(rpc_plugins)
 
-include (GNUInstallDirs)
+include(GNUInstallDirs)
 
-add_library (${PROJECT_NAME} MODULE)
+add_library(${PROJECT_NAME} MODULE)
 
-target_sources (
+target_sources(
   ${PROJECT_NAME}
   PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/src/interior_data_cache_impl.cc"
@@ -58,7 +58,7 @@ target_sources (
   "${CMAKE_CURRENT_LIST_DIR}/src/commands/mobile/set_interior_vehicle_data_response.cc"
 )
 
-target_link_libraries (
+target_link_libraries(
   ${PROJECT_NAME}
   PUBLIC
     rpc_base::rpc_base
@@ -71,9 +71,9 @@ target_link_libraries (
   PRIVATE application_manager::interface components::interface
 )
 
-target_include_directories (${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
 
-install (
+install(
   TARGETS ${PROJECT_NAME}
   DESTINATION "${SDL_PLUGINS_INSTALL_DIR}"
   COMPONENT

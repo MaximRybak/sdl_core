@@ -21,16 +21,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # --- jsoncpp
-add_subdirectory (./jsoncpp)
-set (JSONCPP_INCLUDE_DIRECTORY ${JSONCPP_INCLUDE_DIRECTORY} PARENT_SCOPE)
+add_subdirectory(./jsoncpp)
+set(JSONCPP_INCLUDE_DIRECTORY ${JSONCPP_INCLUDE_DIRECTORY} PARENT_SCOPE)
 
 # --- encryption
-add_subdirectory (./encryption)
-set (ENCRYPTION_INCLUDE_DIRECTORY ${ENCRYPTION_INCLUDE_DIRECTORY} PARENT_SCOPE)
+add_subdirectory(./encryption)
+set(ENCRYPTION_INCLUDE_DIRECTORY ${ENCRYPTION_INCLUDE_DIRECTORY} PARENT_SCOPE)
 
 # --- gmock
 if (BUILD_TESTS)
-  add_subdirectory (./gmock-1.7.0)
-  set (GMOCK_INCLUDE_DIRECTORY ${GMOCK_INCLUDE_DIRECTORY} PARENT_SCOPE)
-  add_subdirectory (test)
+  add_subdirectory(./gmock-1.7.0)
+  set(GMOCK_INCLUDE_DIRECTORY ${GMOCK_INCLUDE_DIRECTORY} PARENT_SCOPE)
+  add_subdirectory(test)
 endif ()

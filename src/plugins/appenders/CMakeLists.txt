@@ -20,31 +20,31 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-project (appenders)
-include (GNUInstallDirs)
+project(appenders)
+include(GNUInstallDirs)
 
-find_package (EXPAT REQUIRED)
+find_package(EXPAT REQUIRED)
 
-add_library (${PROJECT_NAME} SHARED)
-add_library (${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_sources (
+target_sources(
   ${PROJECT_NAME}
   PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/src/safe_file_appender.cc"
   "${CMAKE_CURRENT_LIST_DIR}/src/safe_rolling_file_appender.cc"
 )
 
-target_include_directories (
+target_include_directories(
   ${PROJECT_NAME}
   PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include" "${THIRD_PARTY_INSTALL_PREFIX}/include"
 )
 
-sdl_find_package (log4cxx REQUIRED)
+sdl_find_package(log4cxx REQUIRED)
 
-target_link_libraries (${PROJECT_NAME} PUBLIC EXPAT::EXPAT log4cxx::log4cxx)
+target_link_libraries(${PROJECT_NAME} PUBLIC EXPAT::EXPAT log4cxx::log4cxx)
 
-install (
+install(
   TARGETS ${PROJECT_NAME}
   DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   COMPONENT

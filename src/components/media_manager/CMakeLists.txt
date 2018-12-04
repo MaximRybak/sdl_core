@@ -20,14 +20,14 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-project (media_manager)
+project(media_manager)
 
-add_library (${PROJECT_NAME} STATIC)
-add_library (${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} STATIC)
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-set (${PROJECT_NAME}_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/include")
+set(${PROJECT_NAME}_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/include")
 
-target_sources (
+target_sources(
   ${PROJECT_NAME} PRIVATE
   # src
   "${CMAKE_CURRENT_LIST_DIR}/src/file_streamer_adapter.cc"
@@ -50,7 +50,7 @@ target_sources (
 )
 
 if (EXTENDED_MEDIA_MODE)
-  target_sources (
+  target_sources(
     ${PROJECT_NAME} PRIVATE
     # audio
     "${CMAKE_CURRENT_LIST_DIR}/src/audio/a2dp_source_player_adapter.cc"
@@ -59,17 +59,17 @@ if (EXTENDED_MEDIA_MODE)
   )
 endif ()
 
-target_link_libraries (
+target_link_libraries(
   ${PROJECT_NAME}
   PUBLIC utils::utils application_manager::application_manager
   PRIVATE components::interface
 )
 
 if (QNXNTO)
-  target_link_libraries (${PROJECT_NAME} PUBLIC socket)
+  target_link_libraries(${PROJECT_NAME} PUBLIC socket)
 endif ()
 
-target_include_directories (
+target_include_directories(
   ${PROJECT_NAME}
   PUBLIC ${${PROJECT_NAME}_INCLUDE_DIRECTORY}
   PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include"

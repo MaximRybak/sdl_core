@@ -20,19 +20,19 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-project (transport_manager)
+project(transport_manager)
 
-add_library (${PROJECT_NAME} STATIC)
-add_library (${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} STATIC)
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_sources (
+target_sources(
   ${PROJECT_NAME}
   PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/src/transport_manager_default.cc"
   "${CMAKE_CURRENT_LIST_DIR}/src/transport_manager_impl.cc"
 )
 
-target_sources (
+target_sources(
   ${PROJECT_NAME}
   PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/src/tcp/tcp_client_listener.cc"
@@ -48,42 +48,42 @@ target_sources (
 )
 
 if (BUILD_TESTS)
-  target_sources (${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/iap2_emulation/iap2_transport_adapter.cc")
+  target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/iap2_emulation/iap2_transport_adapter.cc")
 endif ()
 
 if (QNXNTO)
-  target_sources (
+  target_sources(
     ${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/src/tcp/platform_specific/qnx/platform_specific_network_interface_listener.cc"
   )
 else ()
-  target_sources (
+  target_sources(
     ${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/src/tcp/platform_specific/linux/platform_specific_network_interface_listener.cc"
   )
 endif ()
 
 if (BUILD_USB_SUPPORT)
-  target_sources (
+  target_sources(
     ${PROJECT_NAME}
     PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/src/usb/usb_aoa_adapter.cc"
     "${CMAKE_CURRENT_LIST_DIR}/src/usb/usb_connection_factory.cc"
     "${CMAKE_CURRENT_LIST_DIR}/src/usb/usb_device_scanner.cc"
   )
-  target_compile_definitions (${PROJECT_NAME} PUBLIC USB_SUPPORT)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC USB_SUPPORT)
 
   if (QNXNTO)
-    target_sources (
+    target_sources(
       ${PROJECT_NAME}
       PRIVATE
       "${CMAKE_CURRENT_LIST_DIR}/src/usb/qnx/platform_usb_device.cc"
       "${CMAKE_CURRENT_LIST_DIR}/src/usb/qnx/usb_connection.cc"
       "${CMAKE_CURRENT_LIST_DIR}/src/usb/qnx/usb_handler.cc"
     )
-    target_link_libraries (${PROJECT_NAME} PUBLIC usbdi)
+    target_link_libraries(${PROJECT_NAME} PUBLIC usbdi)
   else ()
-    target_sources (
+    target_sources(
       ${PROJECT_NAME}
       PRIVATE
       "${CMAKE_CURRENT_LIST_DIR}/src/usb/libusb/platform_usb_device.cc"
@@ -95,7 +95,7 @@ endif ()
 
 if (BUILD_BT_SUPPORT)
   if (QNXNTO)
-    target_sources (
+    target_sources(
       ${PROJECT_NAME}
       PRIVATE
       "${CMAKE_CURRENT_LIST_DIR}/src/bluetooth/bluetooth_connection_factory.cc"
@@ -105,11 +105,11 @@ if (BUILD_BT_SUPPORT)
       "${CMAKE_CURRENT_LIST_DIR}/src/bluetooth/bluetooth_listener.cc"
       "${CMAKE_CURRENT_LIST_DIR}/src/bluetooth/bluetooth_transport_adapter.cc"
     )
-    target_compile_definitions (${PROJECT_NAME} PUBLIC BLUETOOTH_SUPPORT)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC BLUETOOTH_SUPPORT)
   endif ()
 endif ()
 
-target_link_libraries (
+target_link_libraries(
   ${PROJECT_NAME}
   PUBLIC
     utils::utils
@@ -120,19 +120,19 @@ target_link_libraries (
 )
 
 if (TELEMETRY_MONITOR)
-  target_link_libraries (${PROJECT_NAME} PUBLIC telemetry_monitor::telemetry_monitor)
+  target_link_libraries(${PROJECT_NAME} PUBLIC telemetry_monitor::telemetry_monitor)
 endif ()
 
 if (QNXNTO)
-  target_include_directories (
+  target_include_directories(
     ${PROJECT_NAME}
     PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include/transport_manager/tcp/platform_specific/qnx"
   )
 else ()
-  target_include_directories (
+  target_include_directories(
     ${PROJECT_NAME}
     PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include/transport_manager/tcp/platform_specific/linux"
   )
 endif ()
 
-target_include_directories (${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")

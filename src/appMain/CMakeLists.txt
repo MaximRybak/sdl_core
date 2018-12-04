@@ -20,12 +20,12 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-project (smartDeviceLinkCore)
+project(smartDeviceLinkCore)
 
-add_executable (${PROJECT_NAME})
-add_executable (${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_executable(${PROJECT_NAME})
+add_executable(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_sources (
+target_sources(
   ${PROJECT_NAME}
   PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/main.cc"
@@ -34,9 +34,9 @@ target_sources (
   "${CMAKE_CURRENT_LIST_DIR}/signal_handlers.cc"
 )
 
-sdl_find_package (boost REQUIRED)
+sdl_find_package(boost REQUIRED)
 
-target_link_libraries (
+target_link_libraries(
   ${PROJECT_NAME}
   PUBLIC
     application_manager::application_manager
@@ -53,33 +53,33 @@ target_link_libraries (
     boost::system
 )
 
-target_include_directories (${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src")
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/src")
 
 if (UNIX AND NOT QNXNTO)
-  target_link_libraries (${PROJECT_NAME} PRIVATE pthread dl)
+  target_link_libraries(${PROJECT_NAME} PRIVATE pthread dl)
 elseif (QNXNTO)
-  target_link_libraries (${PROJECT_NAME} PRIVATE iconv)
+  target_link_libraries(${PROJECT_NAME} PRIVATE iconv)
 endif ()
 
 if (BUILD_BT_SUPPORT)
-  target_link_libraries (${PROJECT_NAME} PRIVATE bluetooth)
+  target_link_libraries(${PROJECT_NAME} PRIVATE bluetooth)
 endif ()
 
 if (BUILD_USB_SUPPORT)
   if (UNIX AND NOT QNXNTO)
-    target_link_libraries (${PROJECT_NAME} PRIVATE libusb-1.0.so)
+    target_link_libraries(${PROJECT_NAME} PRIVATE libusb-1.0.so)
   endif ()
 endif ()
 
-install (TARGETS ${PROJECT_NAME} DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT sdl_core)
+install(TARGETS ${PROJECT_NAME} DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT sdl_core)
 
 # Print/Generate SDL dependencies file only for QNX platform
 if (QNXNTO)
   if (CMAKE_HOST_UNIX) # Available only for unix-based operation systems
-    set (BUILD_IDS_FILE ${CMAKE_BINARY_DIR}/build_ids.txt)
-    set (BUILD_IDS_SEARCH_PATH ${CMAKE_BINARY_DIR} ${CMAKE_FIND_ROOT_PATH})
+    set(BUILD_IDS_FILE ${CMAKE_BINARY_DIR}/build_ids.txt)
+    set(BUILD_IDS_SEARCH_PATH ${CMAKE_BINARY_DIR} ${CMAKE_FIND_ROOT_PATH})
 
-    add_custom_command (
+    add_custom_command(
       TARGET ${PROJECT_NAME} POST_BUILD
       COMMAND ${CMAKE_SOURCE_DIR}/tools/Utils/check_build_ids.sh ARGS ${BUILD_IDS_SEARCH_PATH} > ${BUILD_IDS_FILE}
       COMMAND cat ${BUILD_IDS_FILE}
@@ -89,22 +89,22 @@ if (QNXNTO)
   endif (CMAKE_HOST_UNIX)
 endif (QNXNTO)
 
-get_property (GIT_COMMIT GLOBAL PROPERTY SDL_VERSION_GIT_COMMIT)
+get_property(GIT_COMMIT GLOBAL PROPERTY SDL_VERSION_GIT_COMMIT)
 
-set (SDL_IN_CONFIG_FILE "${CMAKE_CURRENT_LIST_DIR}/smartDeviceLink.ini")
+set(SDL_IN_CONFIG_FILE "${CMAKE_CURRENT_LIST_DIR}/smartDeviceLink.ini")
 
 if (QNXNTO)
-  set (SDL_CONFIG_PATH "/${SDL_CONFIG_INSTALL_DIR}")
-  set (SDL_CACERTIFICATE_PATH "/${SDL_CONFIG_INSTALL_DIR}")
-  set (SDL_PLUGINS_PATH "/${SDL_PLUGINS_INSTALL_DIR}")
-  set (SDL_LOG_PATH "/fs/storage/rwdata/logs")
-  set (SDL_LOG_FILENAME "smartdevicelink.log")
-  set (SDL_LOG_FILE "${SDL_LOG_PATH}/${SDL_LOG_FILENAME}")
-  set (SDL_STORAGE_PATH "/fs/storage/rwdata/storage/sdl")
-  set (SDL_TMPDIR_PATH "/fs/tmpfs")
+  set(SDL_CONFIG_PATH "/${SDL_CONFIG_INSTALL_DIR}")
+  set(SDL_CACERTIFICATE_PATH "/${SDL_CONFIG_INSTALL_DIR}")
+  set(SDL_PLUGINS_PATH "/${SDL_PLUGINS_INSTALL_DIR}")
+  set(SDL_LOG_PATH "/fs/storage/rwdata/logs")
+  set(SDL_LOG_FILENAME "smartdevicelink.log")
+  set(SDL_LOG_FILE "${SDL_LOG_PATH}/${SDL_LOG_FILENAME}")
+  set(SDL_STORAGE_PATH "/fs/storage/rwdata/storage/sdl")
+  set(SDL_TMPDIR_PATH "/fs/tmpfs")
 
-  set (POLICY_QDB_DB_INITIALIZER "${CMAKE_CURRENT_LIST_DIR}/init_policy.sh")
-  install (
+  set(POLICY_QDB_DB_INITIALIZER "${CMAKE_CURRENT_LIST_DIR}/init_policy.sh")
+  install(
     FILES ${POLICY_QDB_DB_INITIALIZER}
     DESTINATION "${SDL_CONFIG_INSTALL_DIR}"
     COMPONENT
@@ -119,32 +119,32 @@ if (QNXNTO)
     WORLD_EXECUTE
   )
 else ()
-  set (SDL_CONFIG_PATH "${SDL_CONFIG_INSTALL_DIR}")
-  set (SDL_CACERTIFICATE_PATH ".")
-  set (SDL_PLUGINS_PATH "./")
-  set (SDL_LOG_PATH ".")
-  set (SDL_LOG_FILENAME "smartdevicelink.log")
-  set (SDL_LOG_FILE ${SDL_LOG_FILENAME})
-  set (SDL_STORAGE_PATH "storage")
+  set(SDL_CONFIG_PATH "${SDL_CONFIG_INSTALL_DIR}")
+  set(SDL_CACERTIFICATE_PATH ".")
+  set(SDL_PLUGINS_PATH "./")
+  set(SDL_LOG_PATH ".")
+  set(SDL_LOG_FILENAME "smartdevicelink.log")
+  set(SDL_LOG_FILE ${SDL_LOG_FILENAME})
+  set(SDL_STORAGE_PATH "storage")
 
-  configure_file (
+  configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/log4cxx.properties" "${CMAKE_CURRENT_BINARY_DIR}/log4cxx.properties" @ONLY
     NEWLINE_STYLE UNIX
   )
 
-  list (APPEND SDL_LOG_CONFIG_LIST "${CMAKE_CURRENT_BINARY_DIR}/log4cxx.properties")
+  list(APPEND SDL_LOG_CONFIG_LIST "${CMAKE_CURRENT_BINARY_DIR}/log4cxx.properties")
 
-  set (BUILD_CONFIG_FILENAME "${CMAKE_CURRENT_BINARY_DIR}/build_config.txt")
-  generate_build_config (${BUILD_CONFIG_FILENAME})
+  set(BUILD_CONFIG_FILENAME "${CMAKE_CURRENT_BINARY_DIR}/build_config.txt")
+  generate_build_config(${BUILD_CONFIG_FILENAME})
 
-  list (APPEND SDL_LOG_CONFIG_LIST "${BUILD_CONFIG_FILENAME}")
+  list(APPEND SDL_LOG_CONFIG_LIST "${BUILD_CONFIG_FILENAME}")
 
-  install (FILES "${CMAKE_CURRENT_SOURCE_DIR}/audio.8bit.wav" DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT sdl_core)
+  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/audio.8bit.wav" DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT sdl_core)
 endif ()
 
-set (SDL_OUT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/smartDeviceLink.ini")
+set(SDL_OUT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/smartDeviceLink.ini")
 
-install (
+install(
   FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/hmi_capabilities.json" "${CMAKE_CURRENT_SOURCE_DIR}/sdl_preloaded_pt.json"
     ${SDL_LOG_CONFIG_LIST}
@@ -152,10 +152,10 @@ install (
   COMPONENT sdl_core
 )
 
-configure_file (${SDL_IN_CONFIG_FILE} ${SDL_OUT_CONFIG_FILE} @ONLY NEWLINE_STYLE UNIX)
+configure_file(${SDL_IN_CONFIG_FILE} ${SDL_OUT_CONFIG_FILE} @ONLY NEWLINE_STYLE UNIX)
 
-install (FILES ${SDL_OUT_CONFIG_FILE} DESTINATION ${SDL_CONFIG_INSTALL_DIR} COMPONENT sdl_core)
+install(FILES ${SDL_OUT_CONFIG_FILE} DESTINATION ${SDL_CONFIG_INSTALL_DIR} COMPONENT sdl_core)
 
 if (BUILD_TESTS)
-  add_subdirectory (test)
+  add_subdirectory(test)
 endif ()

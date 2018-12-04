@@ -20,28 +20,28 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-sdl_find_package (apr-util)
+sdl_find_package(apr-util)
 
 if (TARGET apr-util::apr-util)
-  return ()
+  return()
 endif ()
 
-set (FORCE_APR_BUILD ON PARENT_SCOPE)
+set(FORCE_APR_BUILD ON PARENT_SCOPE)
 
-set (APR_UTIL_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../apr-util-1.5.3)
-set (APR_UTIL_BUILD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../apr-util-build)
+set(APR_UTIL_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../apr-util-1.5.3)
+set(APR_UTIL_BUILD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../apr-util-build)
 
-set (APR_UTIL_INCLUDE_DIRECTORY ${APR_UTIL_SOURCE_DIRECTORY}/include)
-set (APR_UTIL_LIBS_DIRECTORY ${APR_UTIL_BUILD_DIRECTORY}/.libs)
+set(APR_UTIL_INCLUDE_DIRECTORY ${APR_UTIL_SOURCE_DIRECTORY}/include)
+set(APR_UTIL_LIBS_DIRECTORY ${APR_UTIL_BUILD_DIRECTORY}/.libs)
 
-file (MAKE_DIRECTORY ${APR_UTIL_BUILD_DIRECTORY})
+file(MAKE_DIRECTORY ${APR_UTIL_BUILD_DIRECTORY})
 
-set (EXPAT_SOURCE_DIRECTORY ${APR_UTIL_SOURCE_DIRECTORY}/../expat-2.1.0)
-set (EXPAT_BUILD_DIRECTORY ${APR_UTIL_BUILD_DIRECTORY}/../expat-2.1.0)
+set(EXPAT_SOURCE_DIRECTORY ${APR_UTIL_SOURCE_DIRECTORY}/../expat-2.1.0)
+set(EXPAT_BUILD_DIRECTORY ${APR_UTIL_BUILD_DIRECTORY}/../expat-2.1.0)
 
-include ("./${PLATFORM}.cmake")
+include("./${PLATFORM}.cmake")
 
-add_custom_command (
+add_custom_command(
   OUTPUT ${APR_UTIL_BUILD_DIRECTORY}/Makefile
   COMMAND CC=${CMAKE_C_COMPILER} ${APR_UTIL_SOURCE_DIRECTORY}/configure ${CONFIGURE_FLAGS}
   DEPENDS libapr-1
@@ -49,14 +49,14 @@ add_custom_command (
   WORKING_DIRECTORY ${APR_UTIL_BUILD_DIRECTORY}
 )
 
-add_custom_target (
+add_custom_target(
   apr-util ALL make
   DEPENDS ${APR_UTIL_BUILD_DIRECTORY}/Makefile
   WORKING_DIRECTORY ${APR_UTIL_BUILD_DIRECTORY}
 )
 
-add_library (apr-util::apr-util UNKNOWN IMPORTED GLOBAL)
-set_target_properties (
+add_library(apr-util::apr-util UNKNOWN IMPORTED GLOBAL)
+set_target_properties(
   apr-util::apr-util
   PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES
@@ -65,10 +65,10 @@ set_target_properties (
     "${APR_UTIL_LIBS_DIRECTORY}/libaprutil-1.so"
 )
 
-add_dependencies (apr-util::apr-util apr-util)
+add_dependencies(apr-util::apr-util apr-util)
 
 if (3RD_PARTY_INSTALL_PREFIX)
-  install (
+  install(
     DIRECTORY ${APR_UTIL_LIBS_DIRECTORY}/
     DESTINATION ${3RD_PARTY_INSTALL_PREFIX_ARCH}/lib
     USE_SOURCE_PERMISSIONS
@@ -76,7 +76,7 @@ if (3RD_PARTY_INSTALL_PREFIX)
     PATTERN libaprutil-1.so*
   )
 
-  install (
+  install(
     DIRECTORY ${APR_UTIL_INCLUDE_DIRECTORY}/
     DESTINATION ${3RD_PARTY_INSTALL_PREFIX}/include
     USE_SOURCE_PERMISSIONS
@@ -84,7 +84,7 @@ if (3RD_PARTY_INSTALL_PREFIX)
     PATTERN *.h
   )
 
-  install (
+  install(
     DIRECTORY ${APR_UTIL_BUILD_DIRECTORY}/include/
     DESTINATION ${3RD_PARTY_INSTALL_PREFIX}/include
     USE_SOURCE_PERMISSIONS
@@ -93,7 +93,7 @@ if (3RD_PARTY_INSTALL_PREFIX)
   )
 endif ()
 
-install (
+install(
   DIRECTORY ${APR_UTIL_LIBS_DIRECTORY}/
   DESTINATION ${CMAKE_INSTALL_LIBDIR}
   USE_SOURCE_PERMISSIONS

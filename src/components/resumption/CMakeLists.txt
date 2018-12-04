@@ -20,13 +20,13 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-project (resumption)
+project(resumption)
 
-add_library (${PROJECT_NAME} STATIC)
-add_library (${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} STATIC)
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-target_sources (${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/last_state_impl.cc")
+target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/last_state_impl.cc")
 
-target_link_libraries (${PROJECT_NAME} PUBLIC utils::utils jsoncpp::jsoncpp PRIVATE components::interface)
+target_link_libraries(${PROJECT_NAME} PUBLIC utils::utils jsoncpp::jsoncpp PRIVATE components::interface)
 
-target_include_directories (${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")

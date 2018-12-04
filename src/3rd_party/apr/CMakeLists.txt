@@ -21,26 +21,26 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 if (NOT FORCE_APR_BUILD)
-  sdl_find_package (apr)
+  sdl_find_package(apr)
 endif ()
 
 if (TARGET apr::apr)
-  set (apr_FOUND ON)
-  return ()
+  set(apr_FOUND ON)
+  return()
 endif ()
 
-set (APR_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../apr-1.5.0)
-set (APR_BUILD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../apr-build)
-set (APR_INCLUDE_DIRECTORY ${APR_SOURCE_DIRECTORY}/include)
-set (APR_LIBS_DIRECTORY ${APR_BUILD_DIRECTORY}/.libs)
+set(APR_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../apr-1.5.0)
+set(APR_BUILD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../apr-build)
+set(APR_INCLUDE_DIRECTORY ${APR_SOURCE_DIRECTORY}/include)
+set(APR_LIBS_DIRECTORY ${APR_BUILD_DIRECTORY}/.libs)
 
-file (MAKE_DIRECTORY ${APR_BUILD_DIRECTORY}/include/private ${APR_SOURCE_DIRECTORY}/include/private)
+file(MAKE_DIRECTORY ${APR_BUILD_DIRECTORY}/include/private ${APR_SOURCE_DIRECTORY}/include/private)
 
-file (COPY ${APR_SOURCE_DIRECTORY}/tools/gen_test_char.c DESTINATION ${APR_BUILD_DIRECTORY}/tools)
+file(COPY ${APR_SOURCE_DIRECTORY}/tools/gen_test_char.c DESTINATION ${APR_BUILD_DIRECTORY}/tools)
 
-include ("./${PLATFORM}.cmake")
+include("./${PLATFORM}.cmake")
 
-add_custom_command (
+add_custom_command(
   OUTPUT ${APR_BUILD_DIRECTORY}/Makefile
   COMMAND CC=${CMAKE_C_COMPILER} ${APR_SOURCE_DIRECTORY}/configure ${CONFIGURE_FLAGS}
   COMMAND
@@ -48,7 +48,7 @@ add_custom_command (
   WORKING_DIRECTORY ${APR_BUILD_DIRECTORY}
 )
 
-add_custom_command (
+add_custom_command(
   OUTPUT ${APR_BUILD_DIRECTORY}/include/private/apr_escape_test_char.h
   DEPENDS ${APR_BUILD_DIRECTORY}/Makefile
   COMMAND make include/private/apr_escape_test_char.h
@@ -57,14 +57,14 @@ add_custom_command (
   WORKING_DIRECTORY ${APR_BUILD_DIRECTORY}
 )
 
-add_custom_target (
+add_custom_target(
   libapr-1 ALL make
   DEPENDS ${APR_BUILD_DIRECTORY}/include/private/apr_escape_test_char.h
   WORKING_DIRECTORY ${APR_BUILD_DIRECTORY}
 )
 
-add_library (apr::apr UNKNOWN IMPORTED GLOBAL)
-set_target_properties (
+add_library(apr::apr UNKNOWN IMPORTED GLOBAL)
+set_target_properties(
   apr::apr
   PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES
@@ -73,10 +73,10 @@ set_target_properties (
     "${APR_LIBS_DIRECTORY}/libapr-1.so"
 )
 
-add_dependencies (apr::apr libapr-1)
+add_dependencies(apr::apr libapr-1)
 
 if (3RD_PARTY_INSTALL_PREFIX)
-  install (
+  install(
     DIRECTORY ${APR_LIBS_DIRECTORY}/
     DESTINATION ${3RD_PARTY_INSTALL_PREFIX_ARCH}/lib
     USE_SOURCE_PERMISSIONS
@@ -84,7 +84,7 @@ if (3RD_PARTY_INSTALL_PREFIX)
     PATTERN libapr-1.so*
   )
 
-  install (
+  install(
     DIRECTORY ${APR_INCLUDE_DIRECTORY}/
     DESTINATION ${3RD_PARTY_INSTALL_PREFIX}/include
     USE_SOURCE_PERMISSIONS
@@ -93,7 +93,7 @@ if (3RD_PARTY_INSTALL_PREFIX)
   )
 endif ()
 
-install (
+install(
   DIRECTORY ${APR_LIBS_DIRECTORY}/
   DESTINATION ${CMAKE_INSTALL_LIBDIR}
   USE_SOURCE_PERMISSIONS

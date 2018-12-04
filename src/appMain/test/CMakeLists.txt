@@ -20,11 +20,11 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-project (low_voltage_signals_handler_test)
+project(low_voltage_signals_handler_test)
 
-create_test (${PROJECT_NAME})
+create_test(${PROJECT_NAME})
 
-target_sources (
+target_sources(
   ${PROJECT_NAME}
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../low_voltage_signals_handler.cc
@@ -32,4 +32,4 @@ target_sources (
   ${COMPONENTS_DIR}/utils/test/mock_signals_posix.cc
 )
 
-target_link_libraries (${PROJECT_NAME} PRIVATE components::interface)
+target_link_libraries(${PROJECT_NAME} PRIVATE components::interface)

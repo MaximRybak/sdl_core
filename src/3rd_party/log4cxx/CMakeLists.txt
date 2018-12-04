@@ -20,33 +20,28 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-sdl_find_package (log4cxx)
+sdl_find_package(log4cxx)
 
 if (TARGET log4cxx::log4cxx)
-  return ()
+  return()
 endif ()
 
-set (LOG4CXX_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../apache-log4cxx-0.10.0)
-set (LOG4CXX_BUILD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../apache-log4cxx-build)
+set(LOG4CXX_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../apache-log4cxx-0.10.0)
+set(LOG4CXX_BUILD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../apache-log4cxx-build)
 
-set (LOG4CXX_SOURCE_INCLUDE_DIRECTORY ${LOG4CXX_BUILD_DIRECTORY}/src/main/include)
+set(LOG4CXX_SOURCE_INCLUDE_DIRECTORY ${LOG4CXX_BUILD_DIRECTORY}/src/main/include)
 
-set (LOG4CXX_LIBS_DIRECTORY ${LOG4CXX_BUILD_DIRECTORY}/src/main/cpp/.libs)
+set(LOG4CXX_LIBS_DIRECTORY ${LOG4CXX_BUILD_DIRECTORY}/src/main/cpp/.libs)
 
-file (MAKE_DIRECTORY ${LOG4CXX_BUILD_DIRECTORY})
+file(MAKE_DIRECTORY ${LOG4CXX_BUILD_DIRECTORY})
 
-file (MAKE_DIRECTORY "${LOG4CXX_SOURCE_INCLUDE_DIRECTORY}")
+file(MAKE_DIRECTORY "${LOG4CXX_SOURCE_INCLUDE_DIRECTORY}")
 
-file (
-  COPY
-  ${LOG4CXX_SOURCE_DIRECTORY}/src/main/include/log4cxx
-  DESTINATION
-  ${LOG4CXX_BUILD_DIRECTORY}/src/main/include/
-)
+file(COPY ${LOG4CXX_SOURCE_DIRECTORY}/src/main/include/log4cxx DESTINATION ${LOG4CXX_BUILD_DIRECTORY}/src/main/include/)
 
-include ("./${PLATFORM}.cmake")
+include("./${PLATFORM}.cmake")
 
-add_custom_command (
+add_custom_command(
   OUTPUT ${LOG4CXX_BUILD_DIRECTORY}/Makefile
   COMMAND ${LOG4CXX_SOURCE_DIRECTORY}/configure ${CONFIGURE_FLAGS}
   DEPENDS libapr-1
@@ -54,7 +49,7 @@ add_custom_command (
   WORKING_DIRECTORY ${LOG4CXX_BUILD_DIRECTORY}
 )
 
-add_custom_target (
+add_custom_target(
   liblog4cxx ALL make
   COMMAND
     /bin/bash -c \" cd ${CMAKE_CURRENT_SOURCE_DIR}\; git log . 1>/dev/null 2>&1\; if [ \\$$? == 0 ]; then grep
@@ -70,8 +65,8 @@ add_custom_target (
   WORKING_DIRECTORY ${LOG4CXX_BUILD_DIRECTORY}
 )
 
-add_library (log4cxx::log4cxx UNKNOWN IMPORTED GLOBAL)
-set_target_properties (
+add_library(log4cxx::log4cxx UNKNOWN IMPORTED GLOBAL)
+set_target_properties(
   log4cxx::log4cxx
   PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES
@@ -80,10 +75,10 @@ set_target_properties (
     "${LOG4CXX_LIBS_DIRECTORY}/liblog4cxx.so"
 )
 
-add_dependencies (log4cxx::log4cxx liblog4cxx)
+add_dependencies(log4cxx::log4cxx liblog4cxx)
 
 if (3RD_PARTY_INSTALL_PREFIX)
-  install (
+  install(
     DIRECTORY ${LOG4CXX_LIBS_DIRECTORY}/
     DESTINATION ${3RD_PARTY_INSTALL_PREFIX_ARCH}/lib
     USE_SOURCE_PERMISSIONS
@@ -91,7 +86,7 @@ if (3RD_PARTY_INSTALL_PREFIX)
     PATTERN liblog4cxx.so*
   )
 
-  install (
+  install(
     DIRECTORY ${LOG4CXX_SOURCE_INCLUDE_DIRECTORY}/
     DESTINATION ${3RD_PARTY_INSTALL_PREFIX}/include
     USE_SOURCE_PERMISSIONS
@@ -100,7 +95,7 @@ if (3RD_PARTY_INSTALL_PREFIX)
   )
 endif ()
 
-install (
+install(
   DIRECTORY ${LOG4CXX_LIBS_DIRECTORY}/
   DESTINATION ${CMAKE_INSTALL_LIBDIR}
   USE_SOURCE_PERMISSIONS

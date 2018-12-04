@@ -20,12 +20,12 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set (target_name dbms)
+set(target_name dbms)
 
-add_library (${target_name} STATIC)
-add_library (${PROJECT_NAME}::${target_name} ALIAS ${target_name})
+add_library(${target_name} STATIC)
+add_library(${PROJECT_NAME}::${target_name} ALIAS ${target_name})
 
-target_sources (
+target_sources(
   ${target_name}
   PRIVATE
   "${CMAKE_CURRENT_LIST_DIR}/sql_database.cc"
@@ -33,4 +33,4 @@ target_sources (
   "${CMAKE_CURRENT_LIST_DIR}/sql_query.cc"
 )
 
-target_link_libraries (${target_name} PUBLIC utils::utils sqlite3 PRIVATE components::interface)
+target_link_libraries(${target_name} PUBLIC utils::utils sqlite3 PRIVATE components::interface)
