@@ -1,23 +1,28 @@
 # Copyright (c) 2018, Ford Motor Company All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
-# following conditions are met:
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# Redistributions of source code must retain the above copyright notice, this list of conditions and the following
-# disclaimer.
+# Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
 #
-# Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
-# disclaimer in the documentation and/or other materials provided with the distribution.
+# Redistributions in binary form must reproduce the above copyright notice, this
+# list of conditions and the following disclaimer in the documentation and/or
+# other materials provided with the distribution.
 #
-# Neither the name of the Ford Motor Company nor the names of its contributors may be used to endorse or promote
-# products derived from this software without specific prior written permission.
+# Neither the name of the Ford Motor Company nor the names of its contributors
+# may be used to endorse or promote products derived from this software without
+# specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 if (NOT FORCE_APR_BUILD)
@@ -34,15 +39,25 @@ set(APR_BUILD_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../apr-build)
 set(APR_INCLUDE_DIRECTORY ${APR_SOURCE_DIRECTORY}/include)
 set(APR_LIBS_DIRECTORY ${APR_BUILD_DIRECTORY}/.libs)
 
-file(MAKE_DIRECTORY ${APR_BUILD_DIRECTORY}/include/private ${APR_SOURCE_DIRECTORY}/include/private)
+file(
+  MAKE_DIRECTORY
+    ${APR_BUILD_DIRECTORY}/include/private
+    ${APR_SOURCE_DIRECTORY}/include/private
+)
 
-file(COPY ${APR_SOURCE_DIRECTORY}/tools/gen_test_char.c DESTINATION ${APR_BUILD_DIRECTORY}/tools)
+file(
+  COPY
+  ${APR_SOURCE_DIRECTORY}/tools/gen_test_char.c
+  DESTINATION
+  ${APR_BUILD_DIRECTORY}/tools
+)
 
 include("./${PLATFORM}.cmake")
 
 add_custom_command(
   OUTPUT ${APR_BUILD_DIRECTORY}/Makefile
-  COMMAND CC=${CMAKE_C_COMPILER} ${APR_SOURCE_DIRECTORY}/configure ${CONFIGURE_FLAGS}
+  COMMAND
+    CC=${CMAKE_C_COMPILER} ${APR_SOURCE_DIRECTORY}/configure ${CONFIGURE_FLAGS}
   COMMAND
     ${CMAKE_COMMAND} -E copy include/apr.h ${APR_SOURCE_DIRECTORY}/include
   WORKING_DIRECTORY ${APR_BUILD_DIRECTORY}
@@ -53,7 +68,8 @@ add_custom_command(
   DEPENDS ${APR_BUILD_DIRECTORY}/Makefile
   COMMAND make include/private/apr_escape_test_char.h
   COMMAND
-    ${CMAKE_COMMAND} -E copy include/private/apr_escape_test_char.h ${APR_SOURCE_DIRECTORY}/include/private
+    ${CMAKE_COMMAND} -E copy include/private/apr_escape_test_char.h
+    ${APR_SOURCE_DIRECTORY}/include/private
   WORKING_DIRECTORY ${APR_BUILD_DIRECTORY}
 )
 

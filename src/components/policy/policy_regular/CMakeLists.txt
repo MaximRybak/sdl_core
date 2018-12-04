@@ -35,7 +35,10 @@ if (ENABLE_HMI_PTU_DECRYPTION)
   target_compile_definitions(${PROJECT_NAME} PUBLIC USE_HMI_PTU_DECRYPTION)
 endif ()
 
-target_include_directories(${PROJECT_NAME} PUBLIC "${${PROJECT_NAME}_INCLUDE_DIR}")
+target_include_directories(
+  ${PROJECT_NAME}
+  PUBLIC "${${PROJECT_NAME}_INCLUDE_DIR}"
+)
 
 install(
   TARGETS ${PROJECT_NAME}

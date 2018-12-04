@@ -1,23 +1,28 @@
 # Copyright (c) 2018, Ford Motor Company All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
-# following conditions are met:
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# Redistributions of source code must retain the above copyright notice, this list of conditions and the following
-# disclaimer.
+# Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
 #
-# Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
-# disclaimer in the documentation and/or other materials provided with the distribution.
+# Redistributions in binary form must reproduce the above copyright notice, this
+# list of conditions and the following disclaimer in the documentation and/or
+# other materials provided with the distribution.
 #
-# Neither the name of the Ford Motor Company nor the names of its contributors may be used to endorse or promote
-# products derived from this software without specific prior written permission.
+# Neither the name of the Ford Motor Company nor the names of its contributors
+# may be used to endorse or promote products derived from this software without
+# specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 project(smartDeviceLinkCore)
@@ -71,7 +76,11 @@ if (BUILD_USB_SUPPORT)
   endif ()
 endif ()
 
-install(TARGETS ${PROJECT_NAME} DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT sdl_core)
+install(
+  TARGETS ${PROJECT_NAME}
+  DESTINATION "${CMAKE_INSTALL_BINDIR}"
+  COMPONENT sdl_core
+)
 
 # Print/Generate SDL dependencies file only for QNX platform
 if (QNXNTO)
@@ -81,7 +90,9 @@ if (QNXNTO)
 
     add_custom_command(
       TARGET ${PROJECT_NAME} POST_BUILD
-      COMMAND ${CMAKE_SOURCE_DIR}/tools/Utils/check_build_ids.sh ARGS ${BUILD_IDS_SEARCH_PATH} > ${BUILD_IDS_FILE}
+      COMMAND
+        ${CMAKE_SOURCE_DIR}/tools/Utils/check_build_ids.sh
+        ARGS ${BUILD_IDS_SEARCH_PATH} > ${BUILD_IDS_FILE}
       COMMAND cat ${BUILD_IDS_FILE}
       COMMENT "Checking build ids of SDL dependencies"
       VERBATIM
@@ -128,33 +139,47 @@ else ()
   set(SDL_STORAGE_PATH "storage")
 
   configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/log4cxx.properties" "${CMAKE_CURRENT_BINARY_DIR}/log4cxx.properties" @ONLY
+    "${CMAKE_CURRENT_SOURCE_DIR}/log4cxx.properties"
+    "${CMAKE_CURRENT_BINARY_DIR}/log4cxx.properties" @ONLY
     NEWLINE_STYLE UNIX
   )
 
-  list(APPEND SDL_LOG_CONFIG_LIST "${CMAKE_CURRENT_BINARY_DIR}/log4cxx.properties")
+  list(
+    APPEND SDL_LOG_CONFIG_LIST "${CMAKE_CURRENT_BINARY_DIR}/log4cxx.properties"
+  )
 
   set(BUILD_CONFIG_FILENAME "${CMAKE_CURRENT_BINARY_DIR}/build_config.txt")
   generate_build_config(${BUILD_CONFIG_FILENAME})
 
   list(APPEND SDL_LOG_CONFIG_LIST "${BUILD_CONFIG_FILENAME}")
 
-  install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/audio.8bit.wav" DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT sdl_core)
+  install(
+    FILES "${CMAKE_CURRENT_SOURCE_DIR}/audio.8bit.wav"
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT sdl_core
+  )
 endif ()
 
 set(SDL_OUT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/smartDeviceLink.ini")
 
 install(
   FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/hmi_capabilities.json" "${CMAKE_CURRENT_SOURCE_DIR}/sdl_preloaded_pt.json"
-    ${SDL_LOG_CONFIG_LIST}
+    "${CMAKE_CURRENT_SOURCE_DIR}/hmi_capabilities.json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sdl_preloaded_pt.json" ${SDL_LOG_CONFIG_LIST}
   DESTINATION ${SDL_CONFIG_INSTALL_DIR}
   COMPONENT sdl_core
 )
 
-configure_file(${SDL_IN_CONFIG_FILE} ${SDL_OUT_CONFIG_FILE} @ONLY NEWLINE_STYLE UNIX)
+configure_file(
+  ${SDL_IN_CONFIG_FILE} ${SDL_OUT_CONFIG_FILE} @ONLY
+  NEWLINE_STYLE UNIX
+)
 
-install(FILES ${SDL_OUT_CONFIG_FILE} DESTINATION ${SDL_CONFIG_INSTALL_DIR} COMPONENT sdl_core)
+install(
+  FILES ${SDL_OUT_CONFIG_FILE}
+  DESTINATION ${SDL_CONFIG_INSTALL_DIR}
+  COMPONENT sdl_core
+)
 
 if (BUILD_TESTS)
   add_subdirectory(test)

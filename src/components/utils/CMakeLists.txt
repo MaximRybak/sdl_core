@@ -29,12 +29,17 @@ target_sources(
 )
 
 if (BUILD_BACKTRACE_SUPPORT AND NOT QNXNTO)
-  target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/back_trace.cc")
+  target_sources(
+    ${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/back_trace.cc"
+  )
   target_compile_definitions(${PROJECT_NAME} PUBLIC BACKTRACE_SUPPORT)
 endif ()
 
 if (QNXNTO)
-  target_sources(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src/threads/pulse_thread_delegate.cc")
+  target_sources(
+    ${PROJECT_NAME} PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/src/threads/pulse_thread_delegate.cc"
+  )
 endif ()
 
 if (ENABLE_LOG)
@@ -77,7 +82,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE components::interface)
 
 target_include_directories(
   ${PROJECT_NAME}
-  PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include" "${CMAKE_CURRENT_LIST_DIR}/include/utils" "${CMAKE_SOURCE_DIR}/src"
+  PUBLIC
+    "${CMAKE_CURRENT_LIST_DIR}/include"
+    "${CMAKE_CURRENT_LIST_DIR}/include/utils" "${CMAKE_SOURCE_DIR}/src"
 )
 
 if (QNXNTO)
