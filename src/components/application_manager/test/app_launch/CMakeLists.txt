@@ -25,7 +25,5 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include("helpers.cmake")
-add_subdirectory(vehicle_info_plugin)
-add_subdirectory(sdl_rpc_plugin)
-add_subdirectory(rc_rpc_plugin)
+add_subdirectory(app_launch_ctrl)
+add_subdirectory(app_launch_data)

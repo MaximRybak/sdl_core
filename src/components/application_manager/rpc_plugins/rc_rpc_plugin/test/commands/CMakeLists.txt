@@ -25,7 +25,26 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include("helpers.cmake")
-add_subdirectory(vehicle_info_plugin)
-add_subdirectory(sdl_rpc_plugin)
-add_subdirectory(rc_rpc_plugin)
+project(rc_commands_test)
+
+create_test(${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME}
+                           PRIVATE ${APPLICATION_MANAGER_DIR}/test/include
+                                   ${APPLICATION_MANAGER_DIR}/include
+                                   ${RC_PLUGIN_TEST_DIR}/include
+                                   ${COMPONENTS_DIR})
+
+target_sources(
+  ${PROJECT_NAME}
+  PRIVATE
+  "${COMPONENTS_DIR}/application_manager/test/mock_message_helper.cc"
+  "${CMAKE_CURRENT_LIST_DIR}/button_press_request_test.cc"
+  "${CMAKE_CURRENT_LIST_DIR}/get_interior_vehicle_data_request_test.cc"
+  "${CMAKE_CURRENT_LIST_DIR}/on_interior_vehicle_data_notification_test.cc"
+  "${CMAKE_CURRENT_LIST_DIR}/on_remote_control_settings_test.cc"
+  "${CMAKE_CURRENT_LIST_DIR}/rc_get_interior_vehicle_data_consent_test.cc"
+  "${CMAKE_CURRENT_LIST_DIR}/set_interior_vehicle_data_request_test.cc")
+
+target_link_libraries(${PROJECT_NAME}
+                      PRIVATE components::interface rpc_plugins_static_lib)

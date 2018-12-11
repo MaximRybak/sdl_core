@@ -25,7 +25,25 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include("helpers.cmake")
-add_subdirectory(vehicle_info_plugin)
-add_subdirectory(sdl_rpc_plugin)
-add_subdirectory(rc_rpc_plugin)
+project(rc_plugin_test)
+
+set(RC_PLUGIN_TEST_DIR "${CMAKE_CURRENT_LIST_DIR}")
+
+create_test(${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME}
+                           PRIVATE ${APPLICATION_MANAGER_DIR}/test/include
+                                   ${APPLICATION_MANAGER_DIR}/include
+                                   ${CMAKE_CURRENT_LIST_DIR}/include
+                                   ${COMPONENTS_DIR})
+
+target_sources(
+  ${PROJECT_NAME}
+  PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/resource_allocation_manager_impl_test.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/interior_data_cache_test.cc")
+
+target_link_libraries(${PROJECT_NAME}
+                      PRIVATE components::interface rpc_plugins_static_lib)
+
+add_subdirectory(commands)

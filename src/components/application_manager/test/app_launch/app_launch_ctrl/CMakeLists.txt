@@ -25,7 +25,16 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include("helpers.cmake")
-add_subdirectory(vehicle_info_plugin)
-add_subdirectory(sdl_rpc_plugin)
-add_subdirectory(rc_rpc_plugin)
+project(app_launch_ctrl_test)
+create_test(${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME}
+                           PRIVATE ${COMPONENTS_DIR}/include/test
+                                   ${APPLICATION_MANAGER_DIR}/test/include/)
+
+target_sources(${PROJECT_NAME} PRIVATE
+               ${CMAKE_CURRENT_SOURCE_DIR}/app_launch_ctrl_test.cc)
+
+target_link_libraries(${PROJECT_NAME}
+                      PRIVATE application_manager::application_manager
+                              components::interface)

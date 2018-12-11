@@ -25,7 +25,19 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include("helpers.cmake")
-add_subdirectory(vehicle_info_plugin)
-add_subdirectory(sdl_rpc_plugin)
-add_subdirectory(rc_rpc_plugin)
+project(request_controller_test)
+create_test(${PROJECT_NAME})
+
+target_include_directories(${PROJECT_NAME}
+                           PRIVATE ${POLICY_MOCK_INCLUDE_PATH}
+                                   ${APPLICATION_MANAGER_DIR}/test/include/)
+
+target_sources(
+  ${PROJECT_NAME}
+  PRIVATE
+  ${APPLICATION_MANAGER_DIR}/test/request_controller/request_controller_test.cc
+  ${APPLICATION_MANAGER_DIR}/test/mock_message_helper.cc)
+
+target_link_libraries(${PROJECT_NAME}
+                      PRIVATE application_manager::application_manager
+                              components::interface)

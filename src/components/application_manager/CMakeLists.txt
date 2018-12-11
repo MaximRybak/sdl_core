@@ -27,6 +27,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+set(APPLICATION_MANAGER_DIR "${CMAKE_CURRENT_LIST_DIR}")
+
 project(application_manager)
 
 add_library(${PROJECT_NAME}_INTERFACE INTERFACE)
@@ -133,3 +135,7 @@ target_include_directories(${PROJECT_NAME}
                            PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
 
 add_subdirectory(rpc_plugins)
+
+if(BUILD_TESTS)
+  add_subdirectory(test)
+endif()
